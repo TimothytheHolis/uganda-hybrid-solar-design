@@ -28,9 +28,9 @@ This Python-based tool models a home or small business energy system with hourly
 
 The system is designed around **two operating modes:**
 
-| Mode | Description | Use Case |
-|------|-------------|----------|
-| **Full Load System** | Solar + battery powers all appliances | Fully off-grid, high-budget |
+| Mode                     | Description                                                         | Use Case                         |
+|--------------------------|---------------------------------------------------------------------|----------------------------------|
+| **Full Load System**     | Solar + battery powers all appliances                               | Fully off-grid, high-budget      |
 | **Critical Load System** | Solar + battery powers only essential devices; heavy loads use grid | Hybrid grid-tied, cost-optimized |
 
 The **Critical Load approach is the main innovation** — it makes solar accessible and reliable for the middle-income Ugandan household.
@@ -118,10 +118,29 @@ Battery capacity is set equal to the **maximum swing in stored energy** during t
 ## 📁 Repository Structure
 
 ```
-├── main.py                         # Main simulation script
-├── load_profile.csv                # Appliance list (edit for your home)
-├── Solar_irradiance_Hourly_*.csv   # NASA POWER irradiance data (Kampala)
-└── README.md
+UGANDA-HYBRID-SOLAR-DESIGN/
+│
+├── LICENSE                                   ← full MIT text here
+├── README.md
+├── requirements.txt                          ← pip install -r requirements.txt
+│
+├── data/
+│   ├── load_profile.csv
+│   └── solar_irradiance/
+│       └── kampala_bwaise_irr_2025.csv       ← sample solar irradiance for Kampala, Bwaise area
+│
+├── outputs/
+│   └── figures/                              ← saved graphs go here
+│       ├── load_vs_solar_full.png
+│       ├── total_vs_critical_load.png
+│       └── optimized_system.png
+│
+└── src/
+    ├── main.py                               ← orchestrates everything
+    ├── load_profile.py                       ← load processing functions
+    ├── solar.py                              ← irradiance processing
+    ├── simulation.py                         ← simulate_system(), binary search
+    └── plotting.py                           ← all plot/save functions
 ```
 
 ---
