@@ -1,181 +1,162 @@
-# Hybrid Solar System Optimization for Ugandan Homes & Small Businesses 🇺🇬☀️
+# Hybrid Solar System Optimization (Uganda) 🇺🇬☀️
 
-A data-driven approach to designing **right-sized hybrid solar systems** that maximize reliability while minimizing cost — built specifically for the Ugandan context.
-
----
-
-## 🌍 The Problem
-
-Grid power in Uganda is unreliable. Load shedding is common, and many households and small businesses need backup power. Solar is the obvious answer — but the way most systems are currently sized leads to two common failure modes:
-
-1. **Oversized batteries** — Traditional solar design formulas assume the battery must store *all* the solar energy generated and supply *all* the load during outages. For homes with heavy appliances (water heaters, electric cookers, flat irons), this results in very large, expensive battery banks. Many households resort to cheap, unreliable batteries — which get damaged quickly, especially when connected directly to loads without proper charge management.
-
-2. **Undersized solar** — To keep costs down, installers sometimes cut the PV array, but without properly accounting for realistic load curves, the system underperforms.
-
-The result: expensive systems that still fail, or cheap systems that damage equipment and batteries.
-
-> **This project proposes a better approach: simulate the real energy balance hour by hour, use solar output directly during the day, and size the battery only for the deficit — not the whole load.**
+A simple tool for designing practical, cost-effective hybrid solar systems for homes and small businesses in Uganda.
 
 ---
 
-## ⚡ Project Overview
+## Why I Built This
 
-This Python-based tool models a home or small business energy system with hourly resolution, using real solar irradiance data and a realistic load profile. It outputs:
+In Uganda, power cuts are normal. So people turn to solar, which is logical because the country's solar potential is high.
 
-- Recommended solar PV size (kW)
-- Recommended battery size (kWh)
-- Visual comparison of load vs solar output across the day
+But from what I've seen, most systems end up either too expensive because they're overdesigned, or unreliable because they're undersized or poorly put together. A big part of the problem is how systems get sized in the first place.
 
-The system is designed around **two operating modes:**
+The common assumption is: *the battery must power everything.* That looks fine on paper, but in practice it leads to very large battery banks, high upfront costs, and people settling for cheap batteries that don't last. On the other end, some installations skip proper design entirely — just trial and error — and those usually work for a while before quietly falling apart.
 
-| Mode                     | Description                                                         | Use Case                         |
-|--------------------------|---------------------------------------------------------------------|----------------------------------|
-| **Full Load System**     | Solar + battery powers all appliances                               | Fully off-grid, high-budget      |
-| **Critical Load System** | Solar + battery powers only essential devices; heavy loads use grid | Hybrid grid-tied, cost-optimized |
-
-The **Critical Load approach is the main innovation** — it makes solar accessible and reliable for the middle-income Ugandan household.
+I wanted to try something more grounded.
 
 ---
 
-## 🧠 How It Works
+## The Idea
 
-### 1. Load Profile Modeling
+Instead of designing for everything, this tool focuses on:
 
-Appliances are entered with their rated wattage, quantity, and usage hours across eight time blocks (0–4, 4–7, 7–10, ... 22–24). The tool computes an hourly energy consumption profile in kWh.
+- using solar output directly during the day, and
+- sizing the battery only for what actually needs backup
 
-Each appliance is tagged as **critical** (must have power during outages) or **non-critical** (can rely on grid).
+Put simply: **don't spend money storing energy you don't need to store.**
 
-Typical critical loads: lights, router, phone charging, fan, small TV, fridge  
-Typical non-critical: electric cooker, flat iron, water heater (paccolator), washing machine
+---
 
-> **Why exclude heavy loads from the battery?** A flat iron or water heater may only run for 30 minutes a day, but its instantaneous power draw (1000–3000W) is enormous. Storing that energy in a battery means paying for large capacity that sits idle most of the time. Let the grid handle those peak loads.
+## What the Tool Does
 
-### 2. Solar Irradiance Data
+This is a Python simulator that takes a realistic load profile (your appliances and when you use them), pulls in real solar irradiance data, and simulates energy flow hour by hour. From that it gives you:
 
-The tool uses real hourly irradiance data from the **NASA POWER dataset** for Kampala (0.35°N, 32.56°E), averaged over a full year to produce a representative daily solar profile.
+- recommended PV size (kW)
+- recommended battery size (kWh)
+- graphs showing how solar output and load interact across the day
 
-Peak Sun Hours (PSH) are derived from this data — a more accurate approach than using a fixed number from a lookup table.
+---
 
-### 3. Energy Flow Simulation
+## Two System Types
 
-The simulator runs hour by hour:
+### 1. Full Load System
+Solar and battery cover everything — no grid required. Good for off-grid setups or high-budget installs where you want complete independence.
+
+### 2. Critical Load System *(main focus)*
+The battery only covers essential appliances. Heavy loads either run on solar during the day or stay on the grid.
+
+| Critical (battery-backed) | Non-critical (grid / daytime solar) |
+|---------------------------|-------------------------------------|
+| Lights                    | Electric cooker                     |
+| Wi-Fi router              | Flat iron                           |
+| Phone & laptop charging   | Water heater                        |
+| TV                        | Washing machine                     |
+
+This cuts battery size significantly without losing reliability where it actually matters.
+
+**Why leave heavy loads off the battery?** An iron or water heater might only run for 20–30 minutes a day, but at 1000–3000W, designing a battery around them means paying for capacity that sits idle almost all the time. It's cheaper and smarter to let them run when solar is strong, or leave them on the grid.
+
+---
+
+## How It Works
+
+1. You define your appliances, their ratings, and when you use them
+2. The tool builds an hourly energy profile across 24 hours
+3. It processes solar data from the [NASA POWER dataset](https://power.larc.nasa.gov/) for your location
+4. It simulates solar production, load demand, and battery charge/discharge hour by hour
+
+For the critical-load case, a binary search finds the **minimum solar size** that keeps the system stable — no oversizing, no guesswork. Battery size is derived from the actual energy swing during simulation, not a rule-of-thumb multiplier.
+
+---
+
+## Results (Typical Ugandan Home)
+
+|              | Full Load System | Critical Load System     |
+|--------------|------------------|--------------------------|
+| Battery size | Large            | Much smaller             |
+| Cost         | High             | More affordable          |
+| Grid needed? | No               | For heavy loads only     |
+| Best for     | Off-grid         | Urban / peri-urban homes |
+
+You still get backup during outages and usable solar during the day — just without overpaying for it.
+
+---
+
+## Who This Is For
+
+- Households that want reliable backup without going fully off-grid
+- Small businesses — shops, salons, stationery, offices
+- Solar technicians looking for a more principled way to size systems
+- Engineers and students working on energy access problems
+
+---
+
+## Tech Stack
+
+- Python 3
+- Pandas
+- Matplotlib
+- Solar irradiance data from [NASA POWER](https://power.larc.nasa.gov/)
+
+---
+
+## How to Use
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Edit your load profile
+# Open data/load_profile.csv and fill in your appliances average usage for the time zones
+
+# Run the simulation
+python src/main.py
+
+# Results and graphs go to outputs/figures/
+```
+
+You can use solar data for any location — just download the hourly irradiance CSV from NASA POWER for your coordinates and point the script at it.
+
+---
+
+## Project Structure
 
 ```
-For each hour:
-  if solar_output >= load:
-      surplus → charge battery (× efficiency)
-  else:
-      deficit from critical load → discharge battery (÷ efficiency)
-```
-
-A 5-day warm-up period stabilizes battery state before final sizing is determined. Charge/discharge efficiency defaults to 85% (representative of lithium iron phosphate or AGM batteries).
-
-### 4. Optimization via Binary Search
-
-For the critical load case, the minimum viable PV size is found using **binary search** between 0 and the full-load PV requirement. At each step, the simulator checks whether the battery state of charge ever drops below zero. The smallest PV size that keeps the battery non-negative is selected.
-
-This avoids the common over-engineering trap of simply adding more panels.
-
-### 5. Battery Sizing
-
-Battery capacity is set equal to the **maximum swing in stored energy** during the simulation — the difference between the peak charge and the point of deepest discharge. This directly represents the real energy buffer needed, rather than a rule-of-thumb multiplier.
-
----
-
-## 📊 Key Results (Example — Typical Ugandan Home)
-
-| Parameter      | Full Load System| Critical Load System    |
-|----------------|-----------------|-------------------------|
-| PV Size        | Larger          | Reduced                 |
-| Battery Size   | Large           | Significantly smaller   |
-| Grid Dependency| None            | Handles heavy loads only|
-| Reliability    | High (off-grid) | High (hybrid)           |
-| Cost           | High            | Moderate                |
-
-> **The critical load approach can reduce battery requirements substantially, directly cutting system cost and improving long-term reliability.**
-
----
-
-## 🚀 Who Is This For?
-
-- **Middle-income households** in Uganda and similar markets who want reliable backup power without spending on an off-grid system
-- **Small businesses** — shops, stationery, salons — needing daytime power continuity
-- **Rural businesses** with agricultural or water pumping needs (irrigation, boreholes)
-- **Solar installers and engineers** wanting a quick simulation tool for client proposals
-- **Researchers and students** studying energy access in sub-Saharan Africa
-
----
-
-## 🛠️ Technologies Used
-
-- **Python 3**
-- **Pandas** — data processing and time-series manipulation
-- **Matplotlib** — visualization
-- **NASA POWER API data** — real irradiance inputs
-
----
-
-## 📁 Repository Structure
-
-```
-UGANDA-HYBRID-SOLAR-DESIGN/
-│
-├── LICENSE                                   ← full MIT text here
-├── README.md
-├── requirements.txt                          ← pip install -r requirements.txt
+uganda-hybrid-solar-design/
 │
 ├── data/
 │   ├── load_profile.csv
 │   └── solar_irradiance/
-│       └── kampala_bwaise_irr_2025.csv       ← sample solar irradiance for Kampala, Bwaise area
+│       └── kampala_bwaise_irr_2025.csv
 │
 ├── outputs/
-│   └── figures/                              ← saved graphs go here
-│       ├── load_vs_solar_full.png
-│       ├── total_vs_critical_load.png
-│       └── optimized_system.png
+│   └── figures/
 │
-└── src/
-    ├── main.py                               ← orchestrates everything
-    ├── load_profile.py                       ← load processing functions
-    ├── solar.py                              ← irradiance processing
-    ├── simulation.py                         ← simulate_system(), binary search
-    └── plotting.py                           ← all plot/save functions
+├── src/
+│   └── main.py
+│
+├── requirements.txt
+└── README.md
 ```
 
 ---
 
-## 🔧 How to Use
+## What's Coming Next
 
-1. **Edit `load_profile.csv`** with your appliances, ratings, quantities, usage hours, and critical status.
-2. **Run `main.py`** — it will output PV and battery sizing for both full-load and critical-load cases, and show plots.
-3. Optionally download fresh irradiance data from [NASA POWER](https://power.larc.nasa.gov/data-access-viewer/) for your location.
-
----
-
-## 🗺️ Roadmap
-
-The following extensions are planned:
-
-- [ ] **Cost analysis** — PV panel, battery, inverter, and installation cost estimates for the Ugandan market
-- [ ] **Payback period calculation** — based on current UMEME tariffs and fuel/generator costs
-- [ ] **Load scheduling** — recommend shifting flexible loads (fridge, water pump, washing machine) to solar hours
-- [ ] **Flexible/deferrable load handling** — model loads that can be shifted to match solar availability
-- [ ] **Multi-day battery simulation** — account for consecutive cloudy days
-- [ ] **Web interface** — allow non-technical users to input their load and get a system recommendation
-- [ ] **Grid tariff integration** — optimize import/export decisions for grid-connected systems
+- [ ] Cost estimates based on current Ugandan market prices
+- [ ] Payback period calculation against UMEME tariffs
+- [ ] Smarter load scheduling — run heavy appliances when solar is strongest
+- [ ] Better handling of consecutive cloudy days
+- [ ] Simple web interface for non-technical users
 
 ---
 
-## 🤝 Author
+## About
 
-**Timothy Mukhooli**  
-Electrical Engineer | Solar Systems Design | Embedded Systems (FPGA, MCU, C)
-
-*Open to collaboration, consulting, and remote work opportunities in energy systems, embedded systems, and engineering tools.*
+Built by **Timothy Mukhooli** — Electrical Engineer with a background in solar systems, FPGA design, and embedded systems. This started as a personal project to address something I kept seeing go wrong in local solar installations. Still a work in progress.
 
 ---
 
-## 📄 License
+## License
 
-MIT License — free to use, adapt, and build upon.
+MIT — use it, modify it, build on it.
